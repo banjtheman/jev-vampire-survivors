@@ -1,0 +1,29 @@
+# Local credentials (only the placeholder template is public)
+.env
+.env.*
+!.env.example
+# Private game copies, inspections and local runtimes
+.local/
+.venv/
+venv/
+# Captures, telemetry and rendered media
+recordings/
+runs/
+*.mp4
+*.mov
+# Build outputs and proprietary compiled assets
+build/
+dist/
+**/bin/
+**/obj/
+*.egg-info/
+*.dll
+*.exe
+*.dylib
+*.app/
+*.pck
+*.pak
+# Python/editor files
+__pycache__/
+*.py[cod]
+.DS_Store
