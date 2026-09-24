@@ -31,8 +31,9 @@ python -m pip install -e '.[video]'
 cp -n .env.example .env
 ```
 
-Edit `.env` locally and replace the placeholder with your **JEV_KEY**. A key is
-required only for live Jev decisions. Never paste it into a chat or commit it.
+Edit `.env` locally and replace the placeholder with your **TYPESAFE_API_KEY**
+(the older `JEV_KEY` name also works). A key is required only for live Jev
+decisions. Never paste it into a chat or commit it.
 The game process does not receive the key. Offline checks need no key or game:
 
 ```sh

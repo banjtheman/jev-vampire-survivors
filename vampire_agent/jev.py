@@ -24,6 +24,8 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 ENDPOINT = "https://api.typesafe.ai/v1/systemone"
 MODEL = "jev-latest"
+# TypeSafe's standard variable first; JEV_KEY keeps older .env files working.
+KEY_NAMES = ("TYPESAFE_API_KEY", "JEV_KEY")
 _QUESTION_ID = "action"
 _MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 
@@ -114,6 +116,15 @@ def load_env(path: str | Path) -> set[str]:
     return loaded
 
 
+def _environment_key() -> str:
+    """Return the first nonempty variable named in KEY_NAMES, or an empty string."""
+    for name in KEY_NAMES:
+        value = os.environ.get(name, "").strip()
+        if value:
+            return value
+    return ""
+
+
 class _NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         # Never forward bearer credentials to a redirected destination.
@@ -173,11 +184,11 @@ class JevClient:
         max_retries: int = 0,
         opener: Callable | None = None,
     ):
-        key = os.environ.get("JEV_KEY", "") if api_key is None else api_key
+        key = _environment_key() if api_key is None else api_key
         if not isinstance(key, str) or not key.strip():
-            raise JevConfigurationError("Set JEV_KEY in the environment or load your .env first.")
+            raise JevConfigurationError("Set TYPESAFE_API_KEY in the environment or load your .env first.")
         if any(ord(char) < 33 or ord(char) > 126 for char in key.strip()):
-            raise JevConfigurationError("JEV_KEY must be a single printable ASCII token.")
+            raise JevConfigurationError("The API key must be a single printable ASCII token.")
         if isinstance(timeout, bool) or not isinstance(timeout, (float, int)) or not math.isfinite(timeout) or timeout <= 0:
             raise JevConfigurationError("timeout must be a positive finite number of seconds.")
         if type(max_retries) is not int or not 0 <= max_retries <= 5:
@@ -247,7 +258,7 @@ class JevClient:
                     time.sleep(delay)
                     continue
                 message = {
-                    401: "Jev authentication failed; check JEV_KEY.",
+                    401: "Jev authentication failed; check TYPESAFE_API_KEY or JEV_KEY.",
                     403: "Jev denied access for this credential.",
                     422: "Jev rejected the request schema; check state and candidate descriptions.",
                     429: "Jev rate limit reached; try again with fresh state later.",

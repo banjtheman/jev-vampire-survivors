@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import patch
 
 from tools import launch_vampire
+from vampire_agent.jev import KEY_NAMES as CLIENT_KEY_NAMES
 
 
 class LauncherTests(unittest.TestCase):
@@ -45,7 +46,8 @@ class LauncherTests(unittest.TestCase):
             stack.enter_context(patch.object(launch_vampire, "ROOT", root))
             stack.enter_context(patch.object(launch_vampire, "PRIVATE", root / "private"))
             stack.enter_context(patch.object(launch_vampire.sys, "platform", "darwin"))
-            stack.enter_context(patch.dict(launch_vampire.os.environ, {"JEV_KEY": "not-a-real-api-key"}))
+            stack.enter_context(patch.dict(launch_vampire.os.environ, {
+                "TYPESAFE_API_KEY": "not-a-real-api-key", "JEV_KEY": "not-a-real-api-key"}))
             compiler = stack.enter_context(patch.object(launch_vampire, "toolchain", return_value=("/test/dotnet", Path("/test/csc.dll"))))
             def fake_build(*args, **kwargs):
                 (root / "dist/vampire/JevVampireBridge.dll").write_bytes(b"synthetic compiled output")
@@ -54,10 +56,16 @@ class LauncherTests(unittest.TestCase):
             copied = launch_vampire.build(app)
             self.assertNotEqual(copied, app)
             self.assertEqual(original.read_bytes(), b"synthetic owned test assembly")
-            self.assertNotIn("JEV_KEY", compiler.call_args.args[0])
+            self.assertTrue(launch_vampire.KEY_NAMES)
+            for name in launch_vampire.KEY_NAMES:
+                self.assertNotIn(name, compiler.call_args.args[0])
             self.assertEqual(processes.call_count, 2)
             for call in processes.call_args_list:
-                self.assertNotIn("JEV_KEY", call.kwargs["env"])
+                for name in launch_vampire.KEY_NAMES:
+                    self.assertNotIn(name, call.kwargs["env"])
+
+    def test_launcher_strips_every_key_name_the_client_reads(self):
+        self.assertEqual(launch_vampire.KEY_NAMES, CLIENT_KEY_NAMES)
 
     def test_unsupported_platform_stops_before_accessing_game(self):
         with patch.object(launch_vampire.sys, "platform", "linux"), \

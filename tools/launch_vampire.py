@@ -21,6 +21,8 @@ DEFAULT_APP = Path.home() / "Library/Application Support/Steam/steamapps/common/
 PRIVATE = ROOT / ".local/vampire-runtime"
 MANAGED = Path("Contents/Resources/Data/Managed")
 ASSEMBLY = "VampireSurvivors.Runtime.dll"
+# API key variables, matching vampire_agent.jev.KEY_NAMES; never passed to child processes.
+KEY_NAMES = ("TYPESAFE_API_KEY", "JEV_KEY")
 
 
 def toolchain(env):
@@ -55,7 +57,7 @@ def build(app: Path) -> Path:
         raise RuntimeError("Expected a Unity Mono installation with VampireSurvivors.Runtime.dll.")
     if original.is_symlink() or not original.resolve().is_relative_to(app):
         raise RuntimeError("Game assembly must be a regular file inside the supplied app.")
-    build_env = {key: value for key, value in os.environ.items() if key != "JEV_KEY"}
+    build_env = {key: value for key, value in os.environ.items() if key not in KEY_NAMES}
     dotnet, compiler = toolchain(build_env)
     source = ROOT / "vampire_bridge/Bridge.cs"
     if not source.is_file():
@@ -113,7 +115,7 @@ def main() -> int:
             print("Prepared:", app)
             return 0
         exe = app / "Contents/MacOS/Vampire Survivors"
-        env = {key: value for key, value in os.environ.items() if key != "JEV_KEY"}
+        env = {key: value for key, value in os.environ.items() if key not in KEY_NAMES}
         env["SteamAppId"] = "1794680"
         env["SteamGameId"] = "1794680"
         env["JEV_RECORD_ROOT"] = str(ROOT / "recordings")

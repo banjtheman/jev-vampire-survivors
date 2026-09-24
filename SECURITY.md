@@ -10,7 +10,7 @@ if available. Otherwise, open an issue requesting a private reporting channel
 without exploit details or credentials. Include the affected commit and a
 minimal sanitized reproduction when reporting privately.
 
-Never include a real `JEV_KEY`, `.env`, authorization header or private game
+Never include a real API key, `.env`, authorization header or private game
 file. Revoke an exposed key with its provider before sharing a reproduction.
 
 ## Local control boundary
@@ -28,8 +28,8 @@ the implemented commands; do not add arbitrary reflection or command execution.
 ## Credentials and game files
 
 The Python controller sends structured gameplay state and candidate actions to
-TypeSafe over HTTPS. It loads `JEV_KEY` from the environment or local credentials
-file. The supplied launcher strips `JEV_KEY` from compiler, patcher and game subprocess environments. The
+TypeSafe over HTTPS. It loads `TYPESAFE_API_KEY` (or the older `JEV_KEY`) from the environment or
+local credentials file. The supplied launcher strips both variables from compiler, patcher and game subprocess environments. The
 bridge, offline tests and renderer do not need this credential.
 
 The launcher patches a private app copy and verifies the original assembly hash.

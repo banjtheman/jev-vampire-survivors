@@ -100,7 +100,7 @@ normally leaves setup manual; `--start-run` can begin the already confirmed stag
 after recording starts.
 
 `JEV_MUTE=1` mutes this process. The launcher defaults to muted; `--audio` opts in
-to normal audio. `JEV_KEY` is never passed to the game.
+to normal audio. The API key is never passed to the game.
 
 ## Recording
 

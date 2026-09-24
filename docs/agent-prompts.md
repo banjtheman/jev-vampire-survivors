@@ -11,7 +11,7 @@ and ask your agent to use it for TypeSafe work:
 npx skills add https://github.com/typesafe-ai/skills --skill typesafe-ai
 ```
 
-Live requests need your own `JEV_KEY` in a local `.env`. Never paste it into the
+Live requests need your own `TYPESAFE_API_KEY` in a local `.env`. Never paste it into the
 conversation. Offline tests, bridge observation and rendering need no key.
 
 ## Set up without making model calls
@@ -45,7 +45,7 @@ Run one recorded Jev/Vampire Survivors test. Use the typesafe-ai skill and
 read the setup guide, current CLI and policy first. I authorize one run
 capped at 360 seconds, 1400 requests and $0.18 estimated known API cost.
 Do not raise these limits or automatically start a replacement run.
-Never reveal JEV_KEY. Use a fresh session name.
+Never reveal the API key. Use a fresh session name.
 
 Launch with the repository's native launcher. Use offline solo, windowed
 and muted. Select Gennaro, Mad Forest and Hyper off if available; preserve

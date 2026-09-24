@@ -2,7 +2,7 @@
 
 This source-only harness builds a local bridge for your own copy of Vampire
 Survivors. The bridge can be used without Jev. Live Jev decisions require your
-own `JEV_KEY`; observation, offline tests and rendering do not.
+own `TYPESAFE_API_KEY`; observation, offline tests and rendering do not.
 
 ## Requirements
 
@@ -44,11 +44,12 @@ For live decisions, copy `.env.example` to `.env` **only if `.env` does not
 already exist**, then edit the local file:
 
 ```dotenv
-JEV_KEY=replace_with_your_own_key
+TYPESAFE_API_KEY=replace_with_your_own_key
 ```
 
 Never paste the real key into a chat, issue, screenshot or commit. The controller
-loads it locally, and the launcher removes `JEV_KEY` from the game's environment.
+loads it locally (the older `JEV_KEY` name also works), and the launcher removes
+the key from the game's environment.
 For a different credentials file, place the global option before the command:
 `python -m vampire_agent --env /path/to/private.env run ...`.
 

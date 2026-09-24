@@ -61,9 +61,22 @@ class JevClientTests(unittest.TestCase):
         self.assertEqual(result.model, "jev-test")
         self.assertEqual(result.usage, {"input_tokens": 125, "output_tokens": 20})
 
+    def test_reads_typesafe_api_key_before_legacy_jev_key(self):
+        cases = (
+            ({"TYPESAFE_API_KEY": "typesafe-key"}, "typesafe-key"),
+            ({"JEV_KEY": "legacy-key"}, "legacy-key"),
+            ({"TYPESAFE_API_KEY": "typesafe-key", "JEV_KEY": "legacy-key"}, "typesafe-key"),
+            ({"TYPESAFE_API_KEY": "  ", "JEV_KEY": "legacy-key"}, "legacy-key"),
+        )
+        for environment, expected in cases:
+            opener = Mock(return_value=response_bytes())
+            with self.subTest(environment=sorted(environment)), patch.dict(os.environ, environment, clear=True):
+                JevClient(opener=opener).choose({"hp": 4}, CANDIDATES, "Which action improves survival?")
+                self.assertEqual(opener.call_args.args[0].get_header("Authorization"), f"Bearer {expected}")
+
     def test_missing_key_and_invalid_configuration_fail_before_request(self):
         with patch.dict(os.environ, {}, clear=True):
-            with self.assertRaises(JevConfigurationError):
+            with self.assertRaisesRegex(JevConfigurationError, "TYPESAFE_API_KEY"):
                 JevClient()
         for options in ({"timeout": 0}, {"timeout": float("nan")}, {"max_retries": 6}, {"max_retries": True}):
             with self.subTest(options=options), self.assertRaises(JevConfigurationError):
